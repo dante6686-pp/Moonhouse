@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Firebase MVP: Chat & Profiles</title>
+    <style>
+        body { font-family: sans-serif; background: #222; color: #fff; padding: 20px; }
+        .hidden { display: none; }
+        .avatar-option { width: 50px; height: 50px; cursor: pointer; border: 2px solid transparent; }
+        .avatar-option.selected { border-color: #ff9900; }
+        .user-card { display: flex; align-items: center; margin: 5px 0; }
+        .avatar { width: 32px; height: 32px; border-radius: 50%; margin-right: 10px; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; margin-left: 10px; }
+        .online { background: #00ff00; }
+        .offline { background: #555; }
+        #chat-box { height: 200px; overflow-y: scroll; border: 1px solid #44 MainWindow; background: #111; padding: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="auth-section">
+        <h2>Zaloguj się lub Zarejestruj</h2>
+        <input type="email" id="email" placeholder="Email"><br><br>
+        <input type="password" id="password" placeholder="Hasło"><br><br>
+        
+        <input type="text" id="nickname" placeholder="Twój Nick (tylko do rejestracji)"><br><br>
+        <p>Wybierz Avatar (tylko do rejestracji):</p>
+        <div id="avatar-picker">
+            <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=1" class="avatar-option selected" data-id="1">
+            <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=2" class="avatar-option data-id="2">
+            <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=3" class="avatar-option" data-id="3">
+        </div>
+        <br>
+        <button id="btn-login">Zaloguj E-mailem</button>
+        <button id="btn-register">Zarejestruj się</button>
+        <hr>
+        <button id="btn-google">Zaloguj przez Google</button>
+    </div>
+
+    <div id="main-section" class="hidden">
+        <h2>Witaj, <span id="user-display-name"></span>! <button id="btn-logout">Wyloguj</button></h2>
+        
+        <h3>Zarejestrowani użytkownicy:</h3>
+        <div id="users-list"></div>
+
+        <h3>Global Chat / Shoutbox</h3>
+        <div id="chat-box"></div>
+        <br>
+        <input type="text" id="chat-input" placeholder="Napisz coś...">
+        <button id="btn-send">Wyślij</button>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
