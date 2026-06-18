@@ -7,7 +7,8 @@ import {
     getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, updateDoc 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// 1. Twoja konfiguracja Firebase z konsoli
+// 1. KONFIGURACJA FIREBASE
+// Podmień na SWOJE klucze z konsoli Firebase!
 const firebaseConfig = {
   apiKey: "AIzaSyAQfMt3UGWwLUi853-GVF_xVVhG50NzHto",
   authDomain: "moonhouse-155b7.firebaseapp.com",
@@ -23,60 +24,93 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
-// Zmienne pomocnicze dla UI
-let selectedAvatarUrl = "https://api.dicebear.com/7.x/pixel-art/svg?seed=1";
+// Zmienne pomocnicze
 let currentUserData = null;
+let selectedAvatarUrl = "https://api.dicebear.com/7.x/bottts/svg?seed=A";
+let selectedShipType = "ship-light";
 
-// Wybór avatara w formularzu
-document.querySelectorAll('.avatar-option').forEach(img => {
+// ==========================================
+// OBSŁUGA INTERFEJSU (Pickery i Modale)
+// ==========================================
+
+function closeAllModals() {
+    document.getElementById('login-modal').style.display = 'none';
+    document.getElementById('register-modal').style.display = 'none';
+}
+
+// Wybór postaci (kombinezonu)
+document.querySelectorAll('#character-picker .picker-item').forEach(img => {
     img.addEventListener('click', (e) => {
-        document.querySelectorAll('.avatar-option').forEach(i => i.classList.remove('selected'));
+        document.querySelectorAll('#character-picker .picker-item').forEach(i => i.classList.remove('selected'));
         e.target.classList.add('selected');
-        selectedAvatarUrl = e.target.src;
+        selectedAvatarUrl = e.target.src; // Pobieramy link do obrazka
     });
 });
 
-// Zmiana statusu Online/Offline w bazie
+// Wybór statku
+document.querySelectorAll('#ship-picker .picker-item').forEach(box => {
+    box.addEventListener('click', (e) => {
+        document.querySelectorAll('#ship-picker .picker-item').forEach(i => i.classList.remove('selected'));
+        e.target.classList.add('selected');
+        selectedShipType = e.target.getAttribute('data-type'); // Pobieramy typ np. "ship-cargo"
+    });
+});
+
+
+// ==========================================
+// AUTORYZACJA I BAZA DANYCH
+// ==========================================
+
+// Zmiana statusu Online/Offline
 async function setUserOnlineStatus(uid, isOnline) {
     if (!uid) return;
     const userRef = doc(db, "users", uid);
-    await updateDoc(userRef, { isOnline: isOnline }).catch(async () => {
-        // Jeśli dokument nie istnieje (np. pierwsze logowanie Google), update rzuci błąd, 
-        // ale obsłużymy to przy tworzeniu profilu.
+    await updateDoc(userRef, { isOnline: isOnline }).catch(() => {
+        // Ignorujemy błąd, jeśli dokument jeszcze nie istnieje (np. przy pierwszym logowaniu Google)
     });
 }
 
-// 2. REJESTRACJA E-MAILEM
+// REJESTRACJA (Email)
 document.getElementById('btn-register').addEventListener('click', async () => {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const nickname = document.getElementById('nickname').value || "Anonim";
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-password').value;
+    const nickname = document.getElementById('reg-nickname').value || "Nieznany Pilot";
+
+    if (!email || !password) {
+        alert("Wprowadź email i hasło!");
+        return;
+    }
 
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Tworzymy profil użytkownika w Firestore
+        // Zapis do bazy z nowymi polami statku
         await setDoc(doc(db, "users", user.uid), {
             uid: user.uid,
             nickname: nickname,
             avatar: selectedAvatarUrl,
+            spaceship: selectedShipType,
             joinedAt: new Date().toLocaleDateString('pl-PL'),
             isOnline: true
         });
+
+        closeAllModals();
     } catch (error) {
-        alert("Błąd rejestracji: " + error.message);
+        alert("Błąd systemów rejestracji: " + error.message);
     }
 });
 
-// 3. LOGOWANIE E-MAILEM
+// LOGOWANIE (Email)
 document.getElementById('btn-login').addEventListener('click', () => {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    signInWithEmailAndPassword(auth, email, password).catch(err => alert(err.message));
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    signInWithEmailAndPassword(auth, email, password)
+        .then(() => closeAllModals())
+        .catch(err => alert("Odmowa dostępu: " + err.message));
 });
 
-// 4. LOGOWANIE GOOGLE
+// LOGOWANIE (Google)
 document.getElementById('btn-google').addEventListener('click', async () => {
     try {
         const result = await signInWithPopup(auth, googleProvider);
@@ -84,95 +118,110 @@ document.getElementById('btn-google').addEventListener('click', async () => {
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
 
-        // Jeśli użytkownik loguje się przez Google pierwszy raz, tworzymy mu profil
+        // Tworzenie profilu, jeśli loguje się pierwszy raz
         if (!userSnap.exists()) {
             await setDoc(userRef, {
                 uid: user.uid,
-                nickname: user.displayName || "Google User",
-                avatar: user.photoURL || "https://api.dicebear.com/7.x/pixel-art/svg?seed=default",
+                nickname: user.displayName || "Pilot Google",
+                avatar: user.photoURL || "https://api.dicebear.com/7.x/bottts/svg?seed=default",
+                spaceship: "ship-light", // Domyślny statek dla kont Google
                 joinedAt: new Date().toLocaleDateString('pl-PL'),
                 isOnline: true
             });
         } else {
             await setUserOnlineStatus(user.uid, true);
         }
+        closeAllModals();
     } catch (error) {
-        alert("Błąd Google Auth: " + error.message);
+        alert("Błąd łącza Google: " + error.message);
     }
 });
 
-// 5. WYLOGOWANIE
+// WYLOGOWANIE
 document.getElementById('btn-logout').addEventListener('click', async () => {
     await setUserOnlineStatus(auth.currentUser?.uid, false);
     signOut(auth);
 });
 
-// Status przy zamknięciu karty
+// Bezpiecznik przy zamknięciu okna przeglądarki
 window.addEventListener('beforeunload', () => {
     if (auth.currentUser) {
         setUserOnlineStatus(auth.currentUser.uid, false);
     }
 });
 
-// 6. OBSŁUGA STANU ZALOGOWANIA (Serce aplikacji)
+
+// ==========================================
+// GŁÓWNA PĘTLA STANU (Słuchacz Logowania)
+// ==========================================
+
 onAuthStateChanged(auth, async (user) => {
-    const authSec = document.getElementById('auth-section');
-    const mainSec = document.getElementById('main-section');
+    const navUnauth = document.getElementById('nav-unauth');
+    const navAuth = document.getElementById('nav-auth');
 
     if (user) {
-        // Użytkownik zalogowany
-        authSec.classList.add('hidden');
-        mainSec.classList.remove('hidden');
+        // Pilot autoryzowany
+        navUnauth.classList.add('hidden');
+        navAuth.classList.remove('hidden');
         
         await setUserOnlineStatus(user.uid, true);
 
-        // Pobieramy dane zalogowanego użytkownika
+        // Pobranie danych profilu z Firestore
         const userSnap = await getDoc(doc(db, "users", user.uid));
         currentUserData = userSnap.data();
-        document.getElementById('user-display-name').innerText = currentUserData?.nickname;
+        
+        // Aktualizacja górnego paska
+        document.getElementById('nav-nickname').innerText = currentUserData?.nickname || "Pilot";
+        document.getElementById('nav-avatar').src = currentUserData?.avatar || "";
 
-        // Uruchamiamy nasłuchiwanie bazy danych na żywo
         startLiveListeners();
     } else {
-        // Użytkownik wylogowany
-        authSec.classList.remove('hidden');
-        mainSec.classList.add('hidden');
+        // Brak autoryzacji
+        navUnauth.classList.remove('hidden');
+        navAuth.classList.add('hidden');
         currentUserData = null;
     }
 });
 
-// 7. NASŁUCHIWANIE NA ŻYWO (Firestore onSnapshot)
+
+// ==========================================
+// NASŁUCHIWANIE DANYCH LIVE (Firestore)
+// ==========================================
+
 let unsubscribeUsers = null;
 let unsubscribeChat = null;
 
 function startLiveListeners() {
-    // Jeśli już nasłuchiwaliśmy, czyścimy stare subskrypcje
     if (unsubscribeUsers) unsubscribeUsers();
     if (unsubscribeChat) unsubscribeChat();
 
-    // LISTA UŻYTKOWNIKÓW (na żywo)
+    // 1. LISTA OBECNYCH NA KSIĘŻYCU
     unsubscribeUsers = onSnapshot(collection(db, "users"), (snapshot) => {
         const usersListDiv = document.getElementById('users-list');
         usersListDiv.innerHTML = "";
         
-        // Zastąp pętlę snapshot.forEach w sekcji CZAT GLOBALNY tym:
-snapshot.forEach((doc) => {
-    const msg = doc.data();
-    const msgRow = document.createElement('div');
-    msgRow.className = "chat-message";
-    msgRow.innerHTML = `
-        <img src="${msg.avatar}" class="avatar">
-        <div class="msg-body">
-            <div class="msg-author">${msg.nickname}</div>
-            <div>${msg.text}</div>
-        </div>
-    `;
-    chatBox.appendChild(msgRow);
-});
-
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            // Pokazujemy tylko tych, którzy są online
+            if(data.isOnline) {
+                const userRow = document.createElement('div');
+                userRow.style.display = "flex";
+                userRow.style.alignItems = "center";
+                userRow.style.marginBottom = "8px";
+                userRow.innerHTML = `
+                    <img src="${data.avatar}" style="width:24px; height:24px; border-radius:50%; margin-right:10px; border: 1px solid var(--accent);">
+                    <span style="font-size: 14px;">${data.nickname}</span>
+                `;
+                usersListDiv.appendChild(userRow);
+            }
+        });
+        
+        if(usersListDiv.innerHTML === "") {
+            usersListDiv.innerHTML = "<span style='color: var(--text-muted); font-size: 12px;'>Brak pilotów w sektorze.</span>";
+        }
     });
 
-    // CZAT GLOBALNY (na żywo, posortowany po czasie)
+    // 2. CZAT GLOBALNY
     const chatQuery = query(collection(db, "messages"), orderBy("timestamp", "asc"));
     unsubscribeChat = onSnapshot(chatQuery, (snapshot) => {
         const chatBox = document.getElementById('chat-box');
@@ -180,25 +229,39 @@ snapshot.forEach((doc) => {
         
         snapshot.forEach((doc) => {
             const msg = doc.data();
+            
+            // Formatowanie czasu jeśli istnieje
+            let timeStr = "";
+            if (msg.timestamp) {
+                const date = msg.timestamp.toDate();
+                timeStr = `[${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}] `;
+            }
+
             const msgRow = document.createElement('div');
-            msgRow.style.margin = "4px 0";
+            msgRow.style.marginBottom = "8px";
+            msgRow.style.fontSize = "13px";
             msgRow.innerHTML = `
-                <img src="${msg.avatar}" class="avatar" style="width:20px; height:20px; vertical-align:middle;">
-                <span style="color:#ff9900;">[${msg.nickname}]:</span> <span>${msg.text}</span>
+                <span style="color: var(--text-muted);">${timeStr}</span>
+                <span style="color: var(--accent); font-weight: bold;">${msg.nickname}:</span> 
+                <span style="color: var(--text-main);">${msg.text}</span>
             `;
             chatBox.appendChild(msgRow);
         });
-        chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll na dół
+        chatBox.scrollTop = chatBox.scrollHeight;
     });
 }
 
-// 8. WYSYŁANIE WIADOMOŚCI NA CZACIE
-document.getElementById('btn-send').addEventListener('click', sendMessage);
+
+// ==========================================
+// WYSYŁANIE WIADOMOŚCI
+// ==========================================
+
+document.getElementById('btn-send').addEventListener('click', sendChatMessage);
 document.getElementById('chat-input').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') sendMessage();
+    if (e.key === 'Enter') sendChatMessage();
 });
 
-async function sendMessage() {
+async function sendChatMessage() {
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
     if (!text || !currentUserData) return;
@@ -207,10 +270,8 @@ async function sendMessage() {
         text: text,
         uid: currentUserData.uid,
         nickname: currentUserData.nickname,
-        avatar: currentUserData.avatar,
         timestamp: new Date()
     });
 
     input.value = "";
 }
-
