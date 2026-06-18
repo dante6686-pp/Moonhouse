@@ -2,7 +2,7 @@
     --bg-deep: #050505;
     --panel-bg: #111111;
     --border: #333333;
-    --accent: #ff9900; /* Industrialny pomarańcz */
+    --accent: #ff9900;
     --accent-hover: #ffb84d;
     --text-main: #e0e0e0;
     --text-muted: #888888;
@@ -11,7 +11,7 @@
 
 body {
     margin: 0;
-    font-family: 'Courier New', Courier, monospace; /* Klimat terminala */
+    font-family: 'Courier New', Courier, monospace;
     background-color: var(--bg-deep);
     color: var(--text-main);
     display: flex;
@@ -20,9 +20,19 @@ body {
 }
 
 .hidden { display: none !important; }
-.scrollable { overflow-y: auto; }
 
-/* Tło Kosmosu (Prosty placeholder) */
+/* Suwaki i scrollowanie */
+.scrollable { 
+    overflow-y: auto; 
+    /* Stylizacja paska przewijania dla klimatu terminala */
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) var(--panel-bg);
+}
+.scrollable::-webkit-scrollbar { width: 6px; }
+.scrollable::-webkit-scrollbar-track { background: var(--panel-bg); }
+.scrollable::-webkit-scrollbar-thumb { background: var(--border); }
+
+/* Tło Kosmosu */
 .space-background {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -33,60 +43,91 @@ body {
 /* --- NAWIGACJA --- */
 .top-nav {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column; /* Na telefonie ułożenie pionowe */
     align-items: center;
-    padding: 15px 30px;
-    background: rgba(17, 17, 17, 0.9);
+    gap: 15px;
+    padding: 15px;
+    background: rgba(17, 17, 17, 0.95);
     border-bottom: 1px solid var(--accent);
 }
 
 .logo {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: bold;
     color: var(--text-main);
     letter-spacing: 2px;
+    text-align: center;
 }
 .logo span { color: var(--accent); }
 
-.nav-actions { display: flex; gap: 15px; align-items: center; }
-.user-badge { display: flex; align-items: center; gap: 10px; background: #000; padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border); }
-.avatar-small { width: 30px; height: 30px; border-radius: 50%; background: #222; }
+.nav-actions { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 10px; 
+    justify-content: center; 
+    width: 100%;
+}
+
+.user-badge { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    background: #000; 
+    padding: 5px 10px; 
+    border-radius: 20px; 
+    border: 1px solid var(--border);
+    font-size: 14px;
+}
+.avatar-small { width: 28px; height: 28px; border-radius: 50%; background: #222; border: 1px solid var(--accent); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; }
+.status-dot.online { background-color: var(--terminal-green); box-shadow: 0 0 5px var(--terminal-green); }
 
 /* --- PRZYCISKI I INPUTY --- */
 button {
-    background: transparent; color: var(--text-main);
-    border: 1px solid var(--border); padding: 8px 16px;
-    cursor: pointer; font-family: inherit; transition: 0.2s;
+    background: var(--panel-bg); color: var(--text-main);
+    border: 1px solid var(--border); padding: 10px 16px;
+    cursor: pointer; font-family: inherit; font-size: 14px; transition: 0.2s;
 }
 button:hover { border-color: var(--accent); color: var(--accent); }
 .btn-primary { background: var(--accent); color: #000; font-weight: bold; border-color: var(--accent); }
 .btn-primary:hover { background: var(--accent-hover); color: #000; }
+.btn-link { color: var(--accent); text-decoration: none; font-size: 14px; padding: 10px; border: 1px solid var(--border); }
 
 input {
-    width: 100%; padding: 10px; margin-bottom: 10px;
+    width: 100%; padding: 12px; margin-bottom: 12px;
     background: #000; border: 1px solid var(--border); color: var(--text-main);
-    font-family: inherit; box-sizing: border-box;
+    font-family: inherit; font-size: 16px; /* 16px zapobiega auto-zoomowi na iOS */
+    box-sizing: border-box;
 }
 input:focus { outline: none; border-color: var(--accent); }
 
 /* --- MAIN DASHBOARD --- */
-.dashboard { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; gap: 20px; }
+.dashboard { 
+    padding: 15px; 
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 20px; 
+}
 
 /* Księżyc Hero */
 .moon-view {
-    width: 100%; height: 40vh;
+    width: 100%; 
+    min-height: 30vh;
     background: #1a1a1a;
     border: 2px dashed var(--border);
     display: flex; justify-content: center; align-items: center;
     text-align: center; color: var(--text-muted);
+    font-size: 12px;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-/* Panele Dolne */
+/* Panele Dolne - Wersja Mobilna (Jedno pod drugim) */
 .bottom-panels {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 20px;
-    height: 35vh;
 }
 
 .panel {
@@ -94,42 +135,105 @@ input:focus { outline: none; border-color: var(--accent); }
     border: 1px solid var(--border);
     display: flex; flex-direction: column;
     padding: 15px;
+    min-height: 250px; /* Zapewnia miejsce na zawartość */
 }
-.panel h3 { margin: 0 0 15px 0; font-size: 14px; color: var(--accent); text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
 
-#chat-box, #event-log, #users-list { flex-grow: 1; margin-bottom: 10px; }
+.panel h3 { 
+    margin: 0 0 15px 0; 
+    font-size: 14px; 
+    color: var(--accent); 
+    text-transform: uppercase; 
+    border-bottom: 1px solid var(--border); 
+    padding-bottom: 5px; 
+}
 
-.event-entry { font-size: 12px; margin-bottom: 5px; }
+#chat-box, #event-log, #users-list { 
+    flex-grow: 1; 
+    margin-bottom: 10px; 
+    height: 150px; /* Sztywna wysokość dla scrolla na mobile */
+}
+
+.event-entry { font-size: 12px; margin-bottom: 8px; line-height: 1.4; }
 .event-entry .time { color: var(--text-muted); }
 .event-entry.highlight { color: var(--terminal-green); }
 
-.input-group { display: flex; gap: 10px; }
-.input-group input { margin: 0; }
+.input-group { display: flex; gap: 8px; }
+.input-group input { margin: 0; flex-grow: 1; }
+.input-group button { margin: 0; white-space: nowrap; }
 
 /* --- MODALE --- */
 .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
     display: none; justify-content: center; align-items: center; z-index: 100;
+    padding: 20px;
+    box-sizing: border-box;
 }
+
 .modal-content {
-    background: var(--panel-bg); padding: 30px;
+    background: var(--panel-bg); padding: 20px;
     border: 1px solid var(--accent); width: 100%; max-width: 400px;
     position: relative;
+    max-height: 90vh; /* Zapobiega uciekaniu modala za ekran */
+    overflow-y: auto; /* Pozwala przewinąć zawartość rejestracji */
 }
 .large-modal { max-width: 700px; }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-.close-btn { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 24px; color: var(--text-muted); }
 
-.picker-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
-.picker-item {
-    width: 60px; height: 60px; border: 2px solid var(--border);
-    cursor: pointer; opacity: 0.5; transition: 0.2s;
+.form-grid { 
+    display: flex; 
+    flex-direction: column; /* Na telefonie jedno pod drugim */
+    gap: 20px; 
 }
-.picker-item.selected { border-color: var(--accent); opacity: 1; }
+
+.close-btn { 
+    position: absolute; top: 10px; right: 15px; 
+    cursor: pointer; font-size: 28px; color: var(--text-muted); 
+    line-height: 1;
+}
+
+.picker-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; justify-content: center; }
+.picker-item {
+    width: 50px; height: 50px; border: 2px solid var(--border);
+    cursor: pointer; opacity: 0.5; transition: 0.2s; background: #000;
+}
+.picker-item.selected { border-color: var(--accent); opacity: 1; transform: scale(1.05); }
 .ship-box {
     display: flex; align-items: center; justify-content: center;
-    font-size: 10px; text-align: center; background: #222; padding: 5px;
+    font-size: 10px; text-align: center; padding: 5px; width: 80px; height: 40px;
 }
 
-footer { text-align: center; padding: 15px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); background: var(--panel-bg); }
+footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); background: var(--panel-bg); }
+
+/* =========================================
+   MEDIA QUERIES - DESKTOP / TABLET
+   ========================================= */
+@media (min-width: 768px) {
+    /* Nawigacja w jednym rzędzie */
+    .top-nav {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 15px 30px;
+    }
+    .nav-actions { width: auto; justify-content: flex-end; }
+    
+    /* Panele układają się w grid (czat szerszy, reszta węższa) */
+    .bottom-panels {
+        flex-direction: row;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        height: 35vh; /* Stała wysokość paneli na desktopie */
+    }
+    
+    #chat-box, #event-log, #users-list { height: auto; } /* Wysokość auto, wypełnia grid */
+    
+    .moon-view { min-height: 40vh; font-size: 16px; }
+    
+    /* Rejestracja w dwóch kolumnach */
+    .form-grid { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        gap: 30px; 
+    }
+    .picker-item { width: 60px; height: 60px; }
+    .ship-box { width: auto; height: 60px; }
+}
