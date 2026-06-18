@@ -4,17 +4,219 @@
     <meta charset="UTF-8">
     <title>Firebase MVP: Chat & Profiles</title>
     <style>
-        body { font-family: sans-serif; background: #222; color: #fff; padding: 20px; }
-        .hidden { display: none; }
-        .avatar-option { width: 50px; height: 50px; cursor: pointer; border: 2px solid transparent; }
-        .avatar-option.selected { border-color: #ff9900; }
-        .user-card { display: flex; align-items: center; margin: 5px 0; }
-        .avatar { width: 32px; height: 32px; border-radius: 50%; margin-right: 10px; }
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; margin-left: 10px; }
-        .online { background: #00ff00; }
-        .offline { background: #555; }
-        #chat-box { height: 200px; overflow-y: scroll; border: 1px solid #44 MainWindow; background: #111; padding: 10px; }
-    </style>
+    :root {
+        --bg-color: #121214;
+        --card-bg: #1a1a1e;
+        --accent: #ff9900;
+        --accent-hover: #ffaa22;
+        --text: #e1e1e6;
+        --text-muted: #8d8d99;
+        --online: #00e676;
+        --offline: #4b4b52;
+    }
+
+    body {
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text);
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        box-sizing: border-box;
+    }
+
+    /* Kontenery sekcji */
+    #auth-section, #main-section {
+        background: var(--card-bg);
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        width: 100%;
+        max-width: 450px;
+        box-sizing: border-box;
+    }
+
+    #main-section {
+        max-width: 800px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    @media (min-width: 768px) {
+        #main-section {
+            grid-template-columns: 250px 1fr;
+        }
+        .main-header { grid-column: 1 / -1; }
+    }
+
+    .hidden { display: none !important; }
+
+    h2, h3 {
+        margin-top: 0;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    /* Formularze i Inputy */
+    input[type="email"], input[type="password"], input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        background: #09090a;
+        border: 1px solid #29292e;
+        border-radius: 6px;
+        color: #fff;
+        font-size: 14px;
+        box-sizing: border-box;
+        margin-bottom: 12px;
+        transition: border-color 0.2s;
+    }
+
+    input:focus {
+        border-color: var(--accent);
+        outline: none;
+    }
+
+    /* Przyciski */
+    button {
+        width: 100%;
+        padding: 12px;
+        background: var(--accent);
+        border: none;
+        border-radius: 6px;
+        color: #000;
+        font-weight: bold;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+        margin-bottom: 8px;
+    }
+
+    button:hover { background: var(--accent-hover); }
+    button:active { transform: scale(0.98); }
+
+    #btn-login { background: #323238; color: #fff; }
+    #btn-login:hover { background: #42424a; }
+    #btn-google { background: #4285F4; color: #fff; }
+    #btn-google:hover { background: #357ae8; }
+    #btn-logout { width: auto; padding: 6px 12px; background: #e040fb; font-size: 12px; margin: 0; }
+
+    /* Wybór Avatara */
+    #avatar-picker {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        justify-content: center;
+    }
+
+    .avatar-option {
+        width: 60px;
+        height: 60px;
+        cursor: pointer;
+        border: 3px solid transparent;
+        border-radius: 8px;
+        background: #09090a;
+        padding: 4px;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .avatar-option:hover { transform: scale(1.05); }
+    .avatar-option.selected { border-color: var(--accent); }
+
+    /* Lista użytkowników */
+    #users-list {
+        background: #09090a;
+        padding: 15px;
+        border-radius: 8px;
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid #29292e;
+    }
+
+    .user-card {
+        display: flex;
+        align-items: center;
+        padding: 8px;
+        border-bottom: 1px solid #1c1c1f;
+    }
+
+    .user-card:last-child { border-bottom: none; }
+
+    .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        margin-right: 12px;
+        background: #1a1a1e;
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .user-info .name { font-weight: bold; font-size: 14px; }
+    .user-info .date { font-size: 11px; color: var(--text-muted); }
+
+    .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        box-shadow: 0 0 8px currentColor;
+    }
+    .online { color: var(--online); background: var(--online); }
+    .offline { color: var(--offline); background: var(--offline); }
+
+    /* Chat / Shoutbox */
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #chat-box {
+        height: 350px;
+        overflow-y: auto;
+        border: 1px solid #29292e;
+        background: #09090a;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .chat-message {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 12px;
+        animation: fadeIn 0.2s ease-in-out;
+    }
+
+    .chat-message img { width: 28px; height: 28px; margin-right: 10px; }
+
+    .msg-body {
+        background: #1a1a1e;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border-top-left-radius: 0;
+        font-size: 14px;
+        max-width: 85%;
+    }
+
+    .msg-author { font-weight: bold; color: var(--accent); margin-bottom: 2px; font-size: 12px; }
+
+    .chat-input-group { display: flex; gap: 8px; }
+    .chat-input-group input { margin: 0; }
+    .chat-input-group button { width: 100px; margin: 0; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
 </head>
 <body>
 
