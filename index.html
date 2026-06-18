@@ -240,17 +240,25 @@
     </div>
 
     <div id="main-section" class="hidden">
+    <div class="main-header">
         <h2>Witaj, <span id="user-display-name"></span>! <button id="btn-logout">Wyloguj</button></h2>
-        
-        <h3>Zarejestrowani użytkownicy:</h3>
+    </div>
+    
+    <div>
+        <h3>Ludzie online:</h3>
         <div id="users-list"></div>
+    </div>
 
+    <div class="chat-container">
         <h3>Global Chat / Shoutbox</h3>
         <div id="chat-box"></div>
-        <br>
-        <input type="text" id="chat-input" placeholder="Napisz coś...">
-        <button id="btn-send">Wyślij</button>
+        <div class="chat-input-group">
+            <input type="text" id="chat-input" placeholder="Napisz coś na czacie...">
+            <button id="btn-send">Wyślij</button>
+        </div>
     </div>
+</div>
+
 
     <script type="module" src="app.js"></script>
 </body>
