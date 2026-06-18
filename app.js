@@ -155,19 +155,21 @@ function startLiveListeners() {
         const usersListDiv = document.getElementById('users-list');
         usersListDiv.innerHTML = "";
         
-        snapshot.forEach((doc) => {
-            const data = doc.data();
-            const statusClass = data.isOnline ? "online" : "offline";
-            
-            const userRow = document.createElement('div');
-            userRow.className = "user-card";
-            userRow.innerHTML = `
-                <img src="${data.avatar}" class="avatar">
-                <span><strong>${data.nickname}</strong> (Dołączył: ${data.joinedAt})</span>
-                <div class="status-dot ${statusClass}"></div>
-            `;
-            usersListDiv.appendChild(userRow);
-        });
+        // Zastąp pętlę snapshot.forEach w sekcji CZAT GLOBALNY tym:
+snapshot.forEach((doc) => {
+    const msg = doc.data();
+    const msgRow = document.createElement('div');
+    msgRow.className = "chat-message";
+    msgRow.innerHTML = `
+        <img src="${msg.avatar}" class="avatar">
+        <div class="msg-body">
+            <div class="msg-author">${msg.nickname}</div>
+            <div>${msg.text}</div>
+        </div>
+    `;
+    chatBox.appendChild(msgRow);
+});
+
     });
 
     // CZAT GLOBALNY (na żywo, posortowany po czasie)
