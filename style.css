@@ -1,0 +1,135 @@
+:root {
+    --bg-deep: #050505;
+    --panel-bg: #111111;
+    --border: #333333;
+    --accent: #ff9900; /* Industrialny pomarańcz */
+    --accent-hover: #ffb84d;
+    --text-main: #e0e0e0;
+    --text-muted: #888888;
+    --terminal-green: #00ff41;
+}
+
+body {
+    margin: 0;
+    font-family: 'Courier New', Courier, monospace; /* Klimat terminala */
+    background-color: var(--bg-deep);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.hidden { display: none !important; }
+.scrollable { overflow-y: auto; }
+
+/* Tło Kosmosu (Prosty placeholder) */
+.space-background {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #000000 100%);
+    z-index: -1;
+}
+
+/* --- NAWIGACJA --- */
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: rgba(17, 17, 17, 0.9);
+    border-bottom: 1px solid var(--accent);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-main);
+    letter-spacing: 2px;
+}
+.logo span { color: var(--accent); }
+
+.nav-actions { display: flex; gap: 15px; align-items: center; }
+.user-badge { display: flex; align-items: center; gap: 10px; background: #000; padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border); }
+.avatar-small { width: 30px; height: 30px; border-radius: 50%; background: #222; }
+
+/* --- PRZYCISKI I INPUTY --- */
+button {
+    background: transparent; color: var(--text-main);
+    border: 1px solid var(--border); padding: 8px 16px;
+    cursor: pointer; font-family: inherit; transition: 0.2s;
+}
+button:hover { border-color: var(--accent); color: var(--accent); }
+.btn-primary { background: var(--accent); color: #000; font-weight: bold; border-color: var(--accent); }
+.btn-primary:hover { background: var(--accent-hover); color: #000; }
+
+input {
+    width: 100%; padding: 10px; margin-bottom: 10px;
+    background: #000; border: 1px solid var(--border); color: var(--text-main);
+    font-family: inherit; box-sizing: border-box;
+}
+input:focus { outline: none; border-color: var(--accent); }
+
+/* --- MAIN DASHBOARD --- */
+.dashboard { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; gap: 20px; }
+
+/* Księżyc Hero */
+.moon-view {
+    width: 100%; height: 40vh;
+    background: #1a1a1a;
+    border: 2px dashed var(--border);
+    display: flex; justify-content: center; align-items: center;
+    text-align: center; color: var(--text-muted);
+}
+
+/* Panele Dolne */
+.bottom-panels {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 20px;
+    height: 35vh;
+}
+
+.panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    padding: 15px;
+}
+.panel h3 { margin: 0 0 15px 0; font-size: 14px; color: var(--accent); text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+
+#chat-box, #event-log, #users-list { flex-grow: 1; margin-bottom: 10px; }
+
+.event-entry { font-size: 12px; margin-bottom: 5px; }
+.event-entry .time { color: var(--text-muted); }
+.event-entry.highlight { color: var(--terminal-green); }
+
+.input-group { display: flex; gap: 10px; }
+.input-group input { margin: 0; }
+
+/* --- MODALE --- */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+    display: none; justify-content: center; align-items: center; z-index: 100;
+}
+.modal-content {
+    background: var(--panel-bg); padding: 30px;
+    border: 1px solid var(--accent); width: 100%; max-width: 400px;
+    position: relative;
+}
+.large-modal { max-width: 700px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+.close-btn { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 24px; color: var(--text-muted); }
+
+.picker-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+.picker-item {
+    width: 60px; height: 60px; border: 2px solid var(--border);
+    cursor: pointer; opacity: 0.5; transition: 0.2s;
+}
+.picker-item.selected { border-color: var(--accent); opacity: 1; }
+.ship-box {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; text-align: center; background: #222; padding: 5px;
+}
+
+footer { text-align: center; padding: 15px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); background: var(--panel-bg); }
