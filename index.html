@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moonhouse - Baza Księżycowa</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="space-background"></div>
+
+    <header class="top-nav">
+        <div class="logo">MOONHOUSE<span>_OS</span></div>
+        
+        <div id="nav-unauth" class="nav-actions">
+            <button onclick="openModal('login-modal')">Zaloguj się</button>
+            <button onclick="openModal('register-modal')" class="btn-primary">Zarejestruj</button>
+        </div>
+        
+        <div id="nav-auth" class="nav-actions hidden">
+            <div class="user-badge">
+                <div class="status-dot online"></div>
+                <span id="nav-nickname">Astronauta</span>
+                <img id="nav-avatar" src="" alt="Avatar" class="avatar-small">
+            </div>
+            <a href="profile.html" class="btn-link">Mój Profil</a>
+            <button id="btn-logout">Wyloguj</button>
+        </div>
+    </header>
+
+    <main class="dashboard">
+        <section class="moon-view">
+            <div class="moon-surface">
+                <p class="placeholder-text">[ MIEJSCE NA GRAFIKĘ KSIĘŻYCA ]<br>Tu będą renderowane stacje i statki użytkowników</p>
+            </div>
+        </section>
+
+        <section class="bottom-panels">
+            <div class="panel chat-panel">
+                <h3>Globalny Kanał Komunikacyjny</h3>
+                <div id="chat-box" class="scrollable"></div>
+                <div class="input-group">
+                    <input type="text" id="chat-input" placeholder="Nadaj komunikat...">
+                    <button id="btn-send">Wyślij</button>
+                </div>
+            </div>
+
+            <div class="panel event-panel">
+                <h3>Log Wydarzeń</h3>
+                <div id="event-log" class="scrollable">
+                    <div class="event-entry"><span class="time">[12:44]</span> System zainicjowany.</div>
+                    <div class="event-entry"><span class="time">[12:45]</span> Dante6686 zbudował Stację Wydobywczą.</div>
+                    <div class="event-entry highlight"><span class="time">[12:47]</span> Nick08 pomyślnie wylądował.</div>
+                </div>
+            </div>
+
+            <div class="panel online-panel">
+                <h3>Obecni na Księżycu</h3>
+                <div id="users-list" class="scrollable"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>MOONHOUSE SYSTEM v0.1 | Projekt Kolonizacji</p>
+    </footer>
+
+    <div class="modal-overlay" id="login-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('login-modal')">&times;</span>
+            <h2>Autoryzacja</h2>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-password" placeholder="Hasło">
+            <button id="btn-login" class="btn-primary">Wejdź do bazy</button>
+            <hr>
+            <button id="btn-google">Autoryzacja Google</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="register-modal">
+        <div class="modal-content large-modal">
+            <span class="close-btn" onclick="closeModal('register-modal')">&times;</span>
+            <h2>Rejestracja Pilota</h2>
+            
+            <div class="form-grid">
+                <div>
+                    <input type="text" id="reg-nickname" placeholder="Twój Sygnatur (Nick)">
+                    <input type="email" id="reg-email" placeholder="Email">
+                    <input type="password" id="reg-password" placeholder="Hasło">
+                </div>
+                
+                <div>
+                    <p>Wybierz Kombinezon (Postać):</p>
+                    <div class="picker-group" id="character-picker">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=A" class="picker-item selected" data-type="char-1">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=B" class="picker-item" data-type="char-2">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=C" class="picker-item" data-type="char-3">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=D" class="picker-item" data-type="char-4">
+                    </div>
+
+                    <p>Wybierz Klasę Statku:</p>
+                    <div class="picker-group" id="ship-picker">
+                        <div class="picker-item ship-box selected" data-type="ship-light">Lekki Zwiadowca</div>
+                        <div class="picker-item ship-box" data-type="ship-cargo">Transportowiec</div>
+                        <div class="picker-item ship-box" data-type="ship-miner">Koparka</div>
+                        <div class="picker-item ship-box" data-type="ship-combat">Fregata</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="btn-register" class="btn-primary" style="margin-top:20px;">Zatwierdź i Wyląduj</button>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+    <script>
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    </script>
+</body>
+</html>
+
