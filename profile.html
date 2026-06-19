@@ -2,46 +2,176 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Moonhouse - Profil Pilota</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .profile-container { max-width: 900px; margin: 40px auto; background: var(--panel-bg); border: 1px solid var(--accent); padding: 30px; }
-        .profile-header { display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 20px; }
-        .profile-avatar { width: 100px; height: 100px; border: 2px solid var(--accent); background: #000; }
-        .profile-info h1 { margin: 0 0 5px 0; color: var(--accent); }
-        .profile-info p { margin: 0; color: var(--text-muted); }
-        
+        .profile-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+            text-align: center;
+        }
+
+        .profile-avatar-wrapper {
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            background: #000;
+            padding: 5px;
+        }
+
+        .profile-info h1 {
+            margin: 0 0 8px 0;
+            color: #fff;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+
+        .profile-status {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .profile-details {
+            font-size: 14px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .profile-details span {
+            color: var(--text-main);
+        }
+
+        /* Sekcja Dziennika */
+        .bio-section h3 {
+            color: var(--accent);
+            font-size: 14px;
+            text-transform: uppercase;
+            margin: 0 0 10px 0;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        .bio-text {
+            background: #050505;
+            border: 1px solid var(--border);
+            padding: 15px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-main);
+            min-height: 60px;
+        }
+
+        /* Wielki Sektor Lądowania */
         .lunar-patch {
-            width: 100%; height: 400px; background: #1a1a1a url('placeholder-moon-ground.jpg') center/cover;
-            border: 1px solid var(--border); display: flex; justify-content: center; align-items: center;
-            color: var(--text-muted); margin-top: 20px; position: relative;
+            width: 100%;
+            min-height: 300px;
+            background: #151518;
+            border: 2px dashed var(--border);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .patch-title {
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        /* Dostosowanie pod desktop */
+        @media (min-width: 768px) {
+            .profile-container {
+                margin: 40px auto;
+                padding: 30px;
+            }
+            .profile-header {
+                flex-direction: row;
+                text-align: left;
+            }
+            .profile-avatar {
+                width: 110px;
+                height: 110px;
+            }
+            .lunar-patch {
+                min-height: 400px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="space-background"></div>
+
     <header class="top-nav">
         <div class="logo">MOONHOUSE<span>_OS</span></div>
-        <a href="index.html" class="btn-primary" style="text-decoration:none;">Wróć do Centrali</a>
+        <a href="index.html" class="btn-primary" style="text-decoration: none;">Powrót do bazy</a>
     </header>
 
     <main class="profile-container">
-        <div class="profile-header">
-            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=A" class="profile-avatar" id="prof-avatar">
-            <div class="profile-info">
-                <h1 id="prof-nickname">Ładowanie sygnatury...</h1>
-                <p>Status: <span style="color: var(--terminal-green)">Operacyjny</span></p>
-                <p id="prof-ship">Klasa Statku: [Brak Danych]</p>
+        <section class="profile-header">
+            <div class="profile-avatar-wrapper">
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=placeholder" class="profile-avatar" id="prof-avatar" alt="Kombinezon">
             </div>
-        </div>
+            <div class="profile-info">
+                <h1 id="prof-nickname">Pobieranie sygnatury...</h1>
+                <div class="profile-status">Status: <span id="prof-status-text" style="color: var(--text-muted);">Inicjalizacja...</span></div>
+                <div class="profile-details">
+                    <div>Klasa statku: <span id="prof-ship">[Brak Danych]</span></div>
+                    <div>Data przybycia: <span id="prof-joined">[Brak Danych]</span></div>
+                </div>
+            </div>
+        </section>
 
-        <h3>Bio / Dziennik Pokładowy:</h3>
-        <p id="prof-bio" style="font-size: 14px; line-height: 1.6;">"Zapisy czarnych skrzynek nie odnalazły wpisów dziennika."</p>
+        <section class="bio-section">
+            <h3>Dziennik Pokładowy (BIO)</h3>
+            <div class="bio-text" id="prof-bio">
+                Modyfikacja dziennika zablokowana. Brak wpisów w bazie danych.
+            </div>
+        </section>
 
-        <div class="lunar-patch">
-            <p>[ SEKTOR LĄDOWANIA - Miejsce na wybraną stację i grafikę postaci ]</p>
-        </div>
+        <section class="lunar-patch">
+            <div class="patch-title">LUNAR_SECTOR // WIZUALIZACJA_POWIERZCHNI</div>
+            <p>[ SEKTOR LĄDOWANIA ]<br>Tu w przyszłości wyświetlimy Twój statek, rozbudowaną stację oraz postać.</p>
+        </section>
     </main>
 
-    </body>
-</html>
+    <footer>
+        <p>MOONHOUSE SYSTEM v0.1 | Profil Użytkownika</p>
+    </footer>
 
+    <script type="module" src="profile.js"></script>
+</body>
+</html>
