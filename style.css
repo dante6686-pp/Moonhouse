@@ -24,7 +24,6 @@ body {
 /* Suwaki i scrollowanie */
 .scrollable { 
     overflow-y: auto; 
-    /* Stylizacja paska przewijania dla klimatu terminala */
     scrollbar-width: thin;
     scrollbar-color: var(--accent) var(--panel-bg);
 }
@@ -43,7 +42,7 @@ body {
 /* --- NAWIGACJA --- */
 .top-nav {
     display: flex;
-    flex-direction: column; /* Na telefonie ułożenie pionowe */
+    flex-direction: column;
     align-items: center;
     gap: 15px;
     padding: 15px;
@@ -96,7 +95,7 @@ button:hover { border-color: var(--accent); color: var(--accent); }
 input {
     width: 100%; padding: 12px; margin-bottom: 12px;
     background: #000; border: 1px solid var(--border); color: var(--text-main);
-    font-family: inherit; font-size: 16px; /* 16px zapobiega auto-zoomowi na iOS */
+    font-family: inherit; font-size: 16px; 
     box-sizing: border-box;
 }
 input:focus { outline: none; border-color: var(--accent); }
@@ -123,7 +122,7 @@ input:focus { outline: none; border-color: var(--accent); }
     box-sizing: border-box;
 }
 
-/* Panele Dolne - Wersja Mobilna (Jedno pod drugim) */
+/* Panele Dolne */
 .bottom-panels {
     display: flex;
     flex-direction: column;
@@ -135,7 +134,7 @@ input:focus { outline: none; border-color: var(--accent); }
     border: 1px solid var(--border);
     display: flex; flex-direction: column;
     padding: 15px;
-    min-height: 250px; /* Zapewnia miejsce na zawartość */
+    min-height: 250px; 
 }
 
 .panel h3 { 
@@ -150,7 +149,7 @@ input:focus { outline: none; border-color: var(--accent); }
 #chat-box, #event-log, #users-list { 
     flex-grow: 1; 
     margin-bottom: 10px; 
-    height: 150px; /* Sztywna wysokość dla scrolla na mobile */
+    height: 150px; 
 }
 
 .event-entry { font-size: 12px; margin-bottom: 8px; line-height: 1.4; }
@@ -174,14 +173,14 @@ input:focus { outline: none; border-color: var(--accent); }
     background: var(--panel-bg); padding: 20px;
     border: 1px solid var(--accent); width: 100%; max-width: 400px;
     position: relative;
-    max-height: 90vh; /* Zapobiega uciekaniu modala za ekran */
-    overflow-y: auto; /* Pozwala przewinąć zawartość rejestracji */
+    max-height: 90vh; 
+    overflow-y: auto; 
 }
 .large-modal { max-width: 700px; }
 
 .form-grid { 
     display: flex; 
-    flex-direction: column; /* Na telefonie jedno pod drugim */
+    flex-direction: column; 
     gap: 20px; 
 }
 
@@ -191,52 +190,21 @@ input:focus { outline: none; border-color: var(--accent); }
     line-height: 1;
 }
 
+/* Graficzny i ostry Picker Pixel Artu (Statki i Astronauci) */
 .picker-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; justify-content: center; }
 .picker-item {
-    width: 50px; height: 50px; border: 2px solid var(--border);
+    width: 60px; height: 60px; border: 2px solid var(--border);
     cursor: pointer; opacity: 0.5; transition: 0.2s; background: #000;
+    padding: 4px;
+    box-sizing: border-box;
+    image-rendering: pixelated; /* Zapobiega rozmywaniu pikseli */
+    image-rendering: crisp-edges;
 }
+.picker-item:hover { opacity: 0.8; border-color: var(--text-muted); }
 .picker-item.selected { border-color: var(--accent); opacity: 1; transform: scale(1.05); }
-.ship-box {
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; text-align: center; padding: 5px; width: 80px; height: 40px;
-}
 
 footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); background: var(--panel-bg); }
 
-/* =========================================
-   MEDIA QUERIES - DESKTOP / TABLET
-   ========================================= */
-@media (min-width: 768px) {
-    /* Nawigacja w jednym rzędzie */
-    .top-nav {
-        flex-direction: row;
-        justify-content: space-between;
-        padding: 15px 30px;
-    }
-    .nav-actions { width: auto; justify-content: flex-end; }
-    
-    /* Panele układają się w grid (czat szerszy, reszta węższa) */
-    .bottom-panels {
-        flex-direction: row;
-        display: grid;
-        grid-template-columns: 2fr 1fr 1fr;
-        height: 35vh; /* Stała wysokość paneli na desktopie */
-    }
-    
-    #chat-box, #event-log, #users-list { height: auto; } /* Wysokość auto, wypełnia grid */
-    
-    .moon-view { min-height: 40vh; font-size: 16px; }
-    
-    /* Rejestracja w dwóch kolumnach */
-    .form-grid { 
-        display: grid; 
-        grid-template-columns: 1fr 1fr; 
-        gap: 30px; 
-    }
-    .picker-item { width: 60px; height: 60px; }
-    .ship-box { width: auto; height: 60px; }
-}
 /* --- DIORAMA PIXEL ART NA PROFILU --- */
 #lunar-diorama {
     width: 100%;
@@ -248,35 +216,58 @@ footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-m
     overflow: hidden;
 }
 
-/* Wspólne ustawienia dla wyrenderowanych obiektów */
 .diorama-element {
     position: absolute;
-    bottom: 20px; /* Pozycja stojąca na gruncie chmury bazy */
-    image-rendering: pixelated; /* Ostre piksele na każdym ekranie */
+    bottom: 20px; 
+    image-rendering: pixelated; 
     image-rendering: crisp-edges;
     transform-origin: bottom center;
     transition: opacity 0.5s ease;
 }
 
-/* Pozycjonujemy statek po lewej stronie */
 #diorama-ship {
     left: 10%;
-    width: 160px; /* Dopasuj wielkość wyświetlania statku */
+    width: 160px; 
     height: auto;
     z-index: 2;
 }
 
-/* Pozycjonujemy astronautę obok statku, nieco bliżej ekranu */
 #diorama-char {
     left: 65%;
-    width: 70px; /* Astronauta mniejszy od statku */
+    width: 70px; 
     height: auto;
     z-index: 3;
 }
 
+/* =========================================
+   MEDIA QUERIES - DESKTOP / TABLET
+   ========================================= */
 @media (min-width: 768px) {
+    .top-nav {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 15px 30px;
+    }
+    .nav-actions { width: auto; justify-content: flex-end; }
+    
+    .bottom-panels {
+        flex-direction: row;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        height: 35vh; 
+    }
+    
+    #chat-box, #event-log, #users-list { height: auto; } 
+    
+    .moon-view { min-height: 40vh; font-size: 16px; }
+    
+    .form-grid { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        gap: 30px; 
+    }
+    
     #lunar-diorama { height: 400px; }
     #diorama-ship { width: 220px; left: 15%; }
     #diorama-char { width: 90px; left: 60%; }
 }
-
