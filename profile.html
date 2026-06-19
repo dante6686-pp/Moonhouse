@@ -6,6 +6,12 @@
     <title>Moonhouse - Profil Pilota</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        /* Styl blokujący mignięcie zawartości przed weryfikacją sesji */
+        .auth-loading {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
         .profile-container {
             max-width: 800px;
             margin: 20px auto;
@@ -15,6 +21,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            transition: opacity 0.3s ease;
         }
 
         .profile-header {
@@ -66,7 +73,6 @@
             color: var(--text-main);
         }
 
-        /* Sekcja Dziennika */
         .bio-section h3 {
             color: var(--accent);
             font-size: 14px;
@@ -86,33 +92,6 @@
             min-height: 60px;
         }
 
-        /* Wielki Sektor Lądowania */
-        .lunar-patch {
-            width: 100%;
-            min-height: 300px;
-            background: #151518;
-            border: 2px dashed var(--border);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: var(--text-muted);
-            padding: 20px;
-            box-sizing: border-box;
-            position: relative;
-        }
-
-        .patch-title {
-            position: absolute;
-            top: 10px;
-            left: 15px;
-            font-size: 10px;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-        }
-
-        /* Dostosowanie pod desktop */
         @media (min-width: 768px) {
             .profile-container {
                 margin: 40px auto;
@@ -126,9 +105,6 @@
                 width: 110px;
                 height: 110px;
             }
-            .lunar-patch {
-                min-height: 400px;
-            }
         }
     </style>
 </head>
@@ -140,10 +116,11 @@
         <a href="index.html" class="btn-primary" style="text-decoration: none;">Powrót do bazy</a>
     </header>
 
-    <main class="profile-container">
+    <!-- Kontener startuje jako ukryty (klasa auth-loading) -->
+    <main class="profile-container auth-loading" id="profile-main-content">
         <section class="profile-header">
             <div class="profile-avatar-wrapper">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=placeholder" class="profile-avatar" id="prof-avatar" alt="Kombinezon">
+                <img src="assets/char-1.png" class="profile-avatar" id="prof-avatar" alt="Kombinezon">
             </div>
             <div class="profile-info">
                 <h1 id="prof-nickname">Pobieranie sygnatury...</h1>
@@ -158,17 +135,15 @@
         <section class="bio-section">
             <h3>Dziennik Pokładowy (BIO)</h3>
             <div class="bio-text" id="prof-bio">
-                Modyfikacja dziennika zablokowana. Brak wpisów w bazie danych.
+                Modyfikacja dziennika zablokowana. Brak nowych wpisów.
             </div>
         </section>
 
         <section class="lunar-patch" id="lunar-diorama">
-    <div class="patch-title">LUNAR_SECTOR // WIZUALIZACJA_POWIERZCHNI</div>
-    
-    <img src="" id="diorama-ship" class="diorama-element hidden" alt="Statek">
-    <img src="" id="diorama-char" class="diorama-element hidden" alt="Astronauta">
-</section>
-
+            <div class="patch-title">LUNAR_SECTOR // WIZUALIZACJA_POWIERZCHNI</div>
+            <img src="" id="diorama-ship" class="diorama-element hidden" alt="Statek">
+            <img src="" id="diorama-char" class="diorama-element hidden" alt="Astronauta">
+        </section>
     </main>
 
     <footer>
