@@ -25,25 +25,25 @@ const shipNames = {
 };
 
 // Sprawdzamy stan zalogowania pilota
+// Zmienna, która chroni przed zbyt szybkim wyrzuceniem ze strony
+let isInitialCheck = true;
+
 onAuthStateChanged(auth, async (user) => {
     if (user) {
+        isInitialCheck = false; // Firebase potwierdził, że użytkownik istnieje
         try {
-            // Pobieramy dane użytkownika z kolekcji "users" w Firestore
             const userSnap = await getDoc(doc(db, "users", user.uid));
             
             if (userSnap.exists()) {
                 const data = userSnap.data();
                 
-                // Mapowanie danych na elementy HTML
                 document.getElementById('prof-nickname').innerText = data.nickname || "Nieznany Pilot";
                 document.getElementById('prof-avatar').src = data.avatar || "https://api.dicebear.com/7.x/bottts/svg?seed=default";
                 document.getElementById('prof-joined').innerText = data.joinedAt || "Nieznana";
                 
-                // Tłumaczenie klasy statku
                 const shipCode = data.spaceship || "ship-light";
                 document.getElementById('prof-ship').innerText = shipNames[shipCode] || shipCode;
 
-                // Status online
                 const statusText = document.getElementById('prof-status-text');
                 if (data.isOnline) {
                     statusText.innerText = "Operacyjny (Online)";
@@ -53,11 +53,9 @@ onAuthStateChanged(auth, async (user) => {
                     statusText.style.color = "var(--text-muted)";
                 }
 
-                // Bio placeholder (możesz później dodać edycję tego pola w bazie)
                 if (data.bio) {
                     document.getElementById('prof-bio').innerText = data.bio;
                 }
-
             } else {
                 document.getElementById('prof-nickname').innerText = "Błąd: Brak profilu w bazie";
             }
@@ -66,8 +64,17 @@ onAuthStateChanged(auth, async (user) => {
             document.getElementById('prof-nickname').innerText = "Błąd połączenia z bazą";
         }
     } else {
-        // Jeśli ktoś wejdzie na profil nie będąc zalogowanym, przekieruj go do bazy głównej
-        window.location.href = "index.html";
+        // Zanim wyrzucimy użytkownika, dajemy Firebase 1.5 sekundy na załadowanie sesji.
+        // Jeśli po tym czasie user nadal jest null, robimy przekierowanie.
+        if (isInitialCheck) {
+            setTimeout(() => {
+                if (!auth.currentUser) {
+                    window.location.href = "index.html";
+                }
+            }, 1500); 
+        } else {
+            window.location.href = "index.html";
+        }
     }
 });
 
