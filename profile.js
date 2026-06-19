@@ -18,12 +18,13 @@ const db = getFirestore(app);
 
 setPersistence(auth, browserLocalPersistence).catch((err) => console.error("Błąd persystencji:", err));
 
-const shipNames = {
+ const shipNames = {
     "ship-light": "Lekki Zwiadowca",
+    "ship-heavy": "Ciężka Koparka", // Zmienione z ship-miner
     "ship-cargo": "Transportowiec Ciężki",
-    "ship-heavy": "Koparka Planetarna",
     "ship-combat": "Fregata Bojowa"
 };
+
 
 onAuthStateChanged(auth, async (user) => {
     const mainContent = document.getElementById('profile-main-content');
