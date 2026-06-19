@@ -237,3 +237,46 @@ footer { text-align: center; padding: 20px; font-size: 12px; color: var(--text-m
     .picker-item { width: 60px; height: 60px; }
     .ship-box { width: auto; height: 60px; }
 }
+/* --- DIORAMA PIXEL ART NA PROFILU --- */
+#lunar-diorama {
+    width: 100%;
+    height: 300px;
+    background: #101012 url('assets/moon-ground.png') no-repeat center bottom;
+    background-size: cover;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Wspólne ustawienia dla wyrenderowanych obiektów */
+.diorama-element {
+    position: absolute;
+    bottom: 20px; /* Pozycja stojąca na gruncie chmury bazy */
+    image-rendering: pixelated; /* Ostre piksele na każdym ekranie */
+    image-rendering: crisp-edges;
+    transform-origin: bottom center;
+    transition: opacity 0.5s ease;
+}
+
+/* Pozycjonujemy statek po lewej stronie */
+#diorama-ship {
+    left: 10%;
+    width: 160px; /* Dopasuj wielkość wyświetlania statku */
+    height: auto;
+    z-index: 2;
+}
+
+/* Pozycjonujemy astronautę obok statku, nieco bliżej ekranu */
+#diorama-char {
+    left: 65%;
+    width: 70px; /* Astronauta mniejszy od statku */
+    height: auto;
+    z-index: 3;
+}
+
+@media (min-width: 768px) {
+    #lunar-diorama { height: 400px; }
+    #diorama-ship { width: 220px; left: 15%; }
+    #diorama-char { width: 90px; left: 60%; }
+}
+
