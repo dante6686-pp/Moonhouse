@@ -121,8 +121,8 @@ document.getElementById('btn-google').addEventListener('click', async () => {
             await setDoc(userRef, {
                 uid: user.uid,
                 nickname: user.displayName || "Pilot Google",
-                avatar: "assets/char-1.png",
-                character: "char-1",
+                avatar: "assets/char-light.png",
+                character: "char-light",
                 spaceship: "ship-light",
                 joinedAt: new Date().toLocaleDateString('pl-PL'),
                 isOnline: true
