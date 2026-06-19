@@ -1,14 +1,14 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { 
     getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
-    signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged 
+    signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged,
+    setPersistence, browserLocalPersistence // <-- DODANE
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { 
     getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, updateDoc 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// 1. KONFIGURACJA FIREBASE
-// Podmień na SWOJE klucze z konsoli Firebase!
+// KONFIGURACJA FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyAQfMt3UGWwLUi853-GVF_xVVhG50NzHto",
   authDomain: "moonhouse-155b7.firebaseapp.com",
@@ -23,6 +23,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
+
+// Wymuszenie zapamiętywania sesji w app.js (DODANE)
+setPersistence(auth, browserLocalPersistence);
 
 // Zmienne pomocnicze
 let currentUserData = null;
