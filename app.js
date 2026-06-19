@@ -2,21 +2,19 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { 
     getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
     signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged,
-    setPersistence, browserLocalPersistence // <-- DODANE
+    setPersistence, browserLocalPersistence 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { 
     getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, query, orderBy, updateDoc 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-// KONFIGURACJA FIREBASE
 const firebaseConfig = {
-  apiKey: "AIzaSyAQfMt3UGWwLUi853-GVF_xVVhG50NzHto",
-  authDomain: "moonhouse-155b7.firebaseapp.com",
-  projectId: "moonhouse-155b7",
-  storageBucket: "moonhouse-155b7.firebasestorage.app",
-  messagingSenderId: "792044657712",
-  appId: "1:792044657712:web:2fbc166d505eecf81e61f5",
-  measurementId: "G-E6Y84RCG7T"
+    apiKey: "TWÓJ_API_KEY",
+    authDomain: "TWÓJ_AUTH_DOMAIN",
+    projectId: "TWÓJ_PROJECT_ID",
+    storageBucket: "TWÓJ_STORAGE_BUCKET",
+    messagingSenderId: "TWÓJ_MESSAGING_SENDER_ID",
+    appId: "TWÓJ_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -24,16 +22,15 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
-// Wymuszenie zapamiętywania sesji w app.js (DODANE)
-setPersistence(auth, browserLocalPersistence);
+setPersistence(auth, browserLocalPersistence).catch((err) => console.error("Błąd pamięci sesji głównej:", err));
 
-// Zmienne pomocnicze
+// Domyślne wartości z graficznych pickerów
 let currentUserData = null;
-let selectedAvatarUrl = "https://api.dicebear.com/7.x/bottts/svg?seed=A";
+let selectedCharType = "char-1";
 let selectedShipType = "ship-light";
 
 // ==========================================
-// OBSŁUGA INTERFEJSU (Pickery i Modale)
+// OBSŁUGA PICKERÓW GRAFICZNYCH (Rejestracja)
 // ==========================================
 
 function closeAllModals() {
@@ -41,53 +38,43 @@ function closeAllModals() {
     document.getElementById('register-modal').style.display = 'none';
 }
 
-// Wybór postaci (kombinezonu)
+// Picker kombinezonów
 document.querySelectorAll('#character-picker .picker-item').forEach(img => {
     img.addEventListener('click', (e) => {
         document.querySelectorAll('#character-picker .picker-item').forEach(i => i.classList.remove('selected'));
         e.target.classList.add('selected');
-        selectedAvatarUrl = e.target.src; // Pobieramy link do obrazka
+        selectedCharType = e.target.getAttribute('data-type') || "char-1";
     });
 });
 
-// Wybór statku w formularzu rejestracji
+// Picker statków kosmicznych
 document.querySelectorAll('#ship-picker .picker-item').forEach(img => {
     img.addEventListener('click', (e) => {
-        // Usuń podświetlenie ze wszystkich statków w pickerze
         document.querySelectorAll('#ship-picker .picker-item').forEach(i => i.classList.remove('selected'));
-        
-        // Dodaj podświetlenie do klikniętego obrazka
         e.target.classList.add('selected');
-        
-        // Zapisz wybrany typ do zmiennej, która leci do Firebase
-        selectedShipType = e.target.getAttribute('data-type'); 
+        selectedShipType = e.target.getAttribute('data-type') || "ship-light"; 
     });
 });
 
-
-
-
-// ==========================================
-// AUTORYZACJA I BAZA DANYCH
-// ==========================================
-
-// Zmiana statusu Online/Offline
+// Zmiana statusu Online w Firestore
 async function setUserOnlineStatus(uid, isOnline) {
     if (!uid) return;
     const userRef = doc(db, "users", uid);
-    await updateDoc(userRef, { isOnline: isOnline }).catch(() => {
-        // Ignorujemy błąd, jeśli dokument jeszcze nie istnieje (np. przy pierwszym logowaniu Google)
-    });
+    await updateDoc(userRef, { isOnline: isOnline }).catch(() => {});
 }
 
-// REJESTRACJA (Email)
+// ==========================================
+// AKCJE AUTORYZACYJNE
+// ==========================================
+
+// Rejestracja e-mail
 document.getElementById('btn-register').addEventListener('click', async () => {
     const email = document.getElementById('reg-email').value;
     const password = document.getElementById('reg-password').value;
     const nickname = document.getElementById('reg-nickname').value || "Nieznany Pilot";
 
     if (!email || !password) {
-        alert("Wprowadź email i hasło!");
+        alert("System wymaga podania adresu e-mail oraz hasła.");
         return;
     }
 
@@ -95,11 +82,12 @@ document.getElementById('btn-register').addEventListener('click', async () => {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Zapis do bazy z nowymi polami statku
+        // Tworzenie pełnego wpisu astronauty w Firestore
         await setDoc(doc(db, "users", user.uid), {
             uid: user.uid,
             nickname: nickname,
-            avatar: selectedAvatarUrl,
+            avatar: `assets/${selectedCharType}.png`,
+            character: selectedCharType,
             spaceship: selectedShipType,
             joinedAt: new Date().toLocaleDateString('pl-PL'),
             isOnline: true
@@ -107,20 +95,20 @@ document.getElementById('btn-register').addEventListener('click', async () => {
 
         closeAllModals();
     } catch (error) {
-        alert("Błąd systemów rejestracji: " + error.message);
+        alert("Błąd rejestracji kadrowej: " + error.message);
     }
 });
 
-// LOGOWANIE (Email)
+// Logowanie e-mail
 document.getElementById('btn-login').addEventListener('click', () => {
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
     signInWithEmailAndPassword(auth, email, password)
         .then(() => closeAllModals())
-        .catch(err => alert("Odmowa dostępu: " + err.message));
+        .catch(err => alert("Odmowa autoryzacji: " + err.message));
 });
 
-// LOGOWANIE (Google)
+// Logowanie Google
 document.getElementById('btn-google').addEventListener('click', async () => {
     try {
         const result = await signInWithPopup(auth, googleProvider);
@@ -128,13 +116,13 @@ document.getElementById('btn-google').addEventListener('click', async () => {
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
 
-        // Tworzenie profilu, jeśli loguje się pierwszy raz
         if (!userSnap.exists()) {
             await setDoc(userRef, {
                 uid: user.uid,
                 nickname: user.displayName || "Pilot Google",
-                avatar: user.photoURL || "https://api.dicebear.com/7.x/bottts/svg?seed=default",
-                spaceship: "ship-light", // Domyślny statek dla kont Google
+                avatar: "assets/char-1.png",
+                character: "char-1",
+                spaceship: "ship-light",
                 joinedAt: new Date().toLocaleDateString('pl-PL'),
                 isOnline: true
             });
@@ -143,26 +131,24 @@ document.getElementById('btn-google').addEventListener('click', async () => {
         }
         closeAllModals();
     } catch (error) {
-        alert("Błąd łącza Google: " + error.message);
+        alert("Błąd sieci kosmicznej Google: " + error.message);
     }
 });
 
-// WYLOGOWANIE
+// Wylogowanie
 document.getElementById('btn-logout').addEventListener('click', async () => {
     await setUserOnlineStatus(auth.currentUser?.uid, false);
     signOut(auth);
 });
 
-// Bezpiecznik przy zamknięciu okna przeglądarki
 window.addEventListener('beforeunload', () => {
     if (auth.currentUser) {
         setUserOnlineStatus(auth.currentUser.uid, false);
     }
 });
 
-
 // ==========================================
-// GŁÓWNA PĘTLA STANU (Słuchacz Logowania)
+// NASŁUCHIWANIE STANU ZALOGOWANIA I LIVE DANYCH
 // ==========================================
 
 onAuthStateChanged(auth, async (user) => {
@@ -170,33 +156,24 @@ onAuthStateChanged(auth, async (user) => {
     const navAuth = document.getElementById('nav-auth');
 
     if (user) {
-        // Pilot autoryzowany
         navUnauth.classList.add('hidden');
         navAuth.classList.remove('hidden');
         
         await setUserOnlineStatus(user.uid, true);
 
-        // Pobranie danych profilu z Firestore
         const userSnap = await getDoc(doc(db, "users", user.uid));
         currentUserData = userSnap.data();
         
-        // Aktualizacja górnego paska
         document.getElementById('nav-nickname').innerText = currentUserData?.nickname || "Pilot";
-        document.getElementById('nav-avatar').src = currentUserData?.avatar || "";
+        document.getElementById('nav-avatar').src = currentUserData?.avatar || "assets/char-1.png";
 
         startLiveListeners();
     } else {
-        // Brak autoryzacji
         navUnauth.classList.remove('hidden');
         navAuth.classList.add('hidden');
         currentUserData = null;
     }
 });
-
-
-// ==========================================
-// NASŁUCHIWANIE DANYCH LIVE (Firestore)
-// ==========================================
 
 let unsubscribeUsers = null;
 let unsubscribeChat = null;
@@ -205,21 +182,20 @@ function startLiveListeners() {
     if (unsubscribeUsers) unsubscribeUsers();
     if (unsubscribeChat) unsubscribeChat();
 
-    // 1. LISTA OBECNYCH NA KSIĘŻYCU
+    // 1. Renderowanie listy zalogowanych astronautów
     unsubscribeUsers = onSnapshot(collection(db, "users"), (snapshot) => {
         const usersListDiv = document.getElementById('users-list');
         usersListDiv.innerHTML = "";
         
         snapshot.forEach((doc) => {
             const data = doc.data();
-            // Pokazujemy tylko tych, którzy są online
             if(data.isOnline) {
                 const userRow = document.createElement('div');
                 userRow.style.display = "flex";
                 userRow.style.alignItems = "center";
-                userRow.style.marginBottom = "8px";
+                userRow.style.marginBottom = "10px";
                 userRow.innerHTML = `
-                    <img src="${data.avatar}" style="width:24px; height:24px; border-radius:50%; margin-right:10px; border: 1px solid var(--accent);">
+                    <img src="${data.avatar || 'assets/char-1.png'}" style="width:28px; height:28px; margin-right:12px; image-rendering:pixelated; border: 1px solid var(--accent);">
                     <span style="font-size: 14px;">${data.nickname}</span>
                 `;
                 usersListDiv.appendChild(userRow);
@@ -227,11 +203,11 @@ function startLiveListeners() {
         });
         
         if(usersListDiv.innerHTML === "") {
-            usersListDiv.innerHTML = "<span style='color: var(--text-muted); font-size: 12px;'>Brak pilotów w sektorze.</span>";
+            usersListDiv.innerHTML = "<span style='color: var(--text-muted); font-size: 12px;'>Brak innych pilotów.</span>";
         }
     });
 
-    // 2. CZAT GLOBALNY
+    // 2. Kanał komunikacyjny (Czat)
     const chatQuery = query(collection(db, "messages"), orderBy("timestamp", "asc"));
     unsubscribeChat = onSnapshot(chatQuery, (snapshot) => {
         const chatBox = document.getElementById('chat-box');
@@ -239,8 +215,6 @@ function startLiveListeners() {
         
         snapshot.forEach((doc) => {
             const msg = doc.data();
-            
-            // Formatowanie czasu jeśli istnieje
             let timeStr = "";
             if (msg.timestamp) {
                 const date = msg.timestamp.toDate();
@@ -261,11 +235,7 @@ function startLiveListeners() {
     });
 }
 
-
-// ==========================================
-// WYSYŁANIE WIADOMOŚCI
-// ==========================================
-
+// Wysyłanie komunikatów na czacie
 document.getElementById('btn-send').addEventListener('click', sendChatMessage);
 document.getElementById('chat-input').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendChatMessage();
