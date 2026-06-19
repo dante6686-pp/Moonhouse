@@ -17,10 +17,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Zabezpieczenie sesji
 setPersistence(auth, browserLocalPersistence).catch((err) => console.error("Błąd persystencji:", err));
 
-// Słownik tłumaczący klasy statków
 const shipNames = {
     "ship-light": "Lekki Zwiadowca",
     "ship-cargo": "Transportowiec Ciężki",
@@ -28,42 +26,42 @@ const shipNames = {
     "ship-combat": "Fregata Bojowa"
 };
 
-let isInitialCheck = true;
+// Flaga określająca, czy Firebase dokonał już pierwszego sprawdzenia sesji
+let firebaseLoaded = false;
 
 onAuthStateChanged(auth, async (user) => {
+    // Dopóki Firebase nie odpowie po raz pierwszy (user może być null na starcie),
+    // ignorujemy pusty stan i czekamy na właściwy sygnał.
+    if (!user && !firebaseLoaded) {
+        firebaseLoaded = true;
+        // Dajemy mikro-szansę sieci na zmianę stanu. Jeśli po chwili nadal nie ma usera, wyrzucamy.
+        setTimeout(() => {
+            if (!auth.currentUser) window.location.href = "index.html";
+        }, 300);
+        return;
+    }
+
     if (user) {
-        isInitialCheck = false;
+        firebaseLoaded = true;
         try {
-            // Pobieramy dane użytkownika z kolekcji "users"
             const userSnap = await getDoc(doc(db, "users", user.uid));
             
             if (userSnap.exists()) {
                 const data = userSnap.data();
                 
-                // 1. Nick (jeśli brak w dokumencie, bierzemy z profilu auth lub dajemy fallback)
+                // Mapowanie danych na interfejs
                 document.getElementById('prof-nickname').innerText = data.nickname || user.displayName || "Nieznany Pilot";
-                
-                // 2. Avatar
                 document.getElementById('prof-avatar').src = data.avatar || user.photoURL || "https://api.dicebear.com/7.x/bottts/svg?seed=default";
+                document.getElementById('prof-joined').innerText = data.joinedAt || "Nieznana";
                 
-                // 3. Data dołączenia
-                document.getElementById('prof-joined').innerText = data.joinedAt || new Date().toLocaleDateString('pl-PL');
-                
-                // 4. Klasa statku (Zabezpieczenie przed undefined dla starych kont)
                 const shipCode = data.spaceship || "ship-light";
                 document.getElementById('prof-ship').innerText = shipNames[shipCode] || "Lekki Zwiadowca";
 
-                // 5. Status połączenia
+                // Ustawiamy sztywno zielony status ONLINE, ponieważ autoryzacja właśnie przeszła pomyślnie
                 const statusText = document.getElementById('prof-status-text');
-                if (data.isOnline !== undefined) {
-                    statusText.innerText = data.isOnline ? "Operacyjny (Online)" : "Brak Łączności (Offline)";
-                    statusText.style.color = data.isOnline ? "var(--terminal-green)" : "var(--text-muted)";
-                } else {
-                    statusText.innerText = "Operacyjny (Online)";
-                    statusText.style.color = "var(--terminal-green)";
-                }
+                statusText.innerText = "Operacyjny (Online)";
+                statusText.style.color = "var(--terminal-green)";
 
-                // 6. Bio / Dziennik
                 if (data.bio) {
                     document.getElementById('prof-bio').innerText = data.bio;
                 } else {
@@ -71,24 +69,14 @@ onAuthStateChanged(auth, async (user) => {
                 }
 
             } else {
-                // Jeśli dokument w ogóle nie istnieje w Firestore dla tego UID
                 document.getElementById('prof-nickname').innerText = "Nie znaleziono dokumentu pilota";
-                document.getElementById('prof-ship').innerText = "Nieznana (Załóż nowe konto)";
-                document.getElementById('prof-joined').innerText = "Brak danych";
             }
         } catch (error) {
-            console.error("Błąd krytyczny Firestore:", error);
+            console.error("Błąd Firestore:", error);
             document.getElementById('prof-nickname').innerText = "Błąd odczytu danych";
         }
     } else {
-        if (isInitialCheck) {
-            setTimeout(() => {
-                if (!auth.currentUser) {
-                    window.location.href = "index.html";
-                }
-            }, 2500); 
-        } else {
-            window.location.href = "index.html";
-        }
+        // Jeśli user wylogował się intencjonalnie, natychmiast powrót
+        window.location.href = "index.html";
     }
 });
