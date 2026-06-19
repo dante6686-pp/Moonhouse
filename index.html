@@ -40,7 +40,7 @@
                 <h3>Globalny Kanał Komunikacyjny</h3>
                 <div id="chat-box" class="scrollable"></div>
                 <div class="input-group">
-                    <input type="text" id="chat-input" placeholder="Nadaj komunikat...">
+                    <input type="text" id="chat-input" placeholder="Nadaj komunikat..." autocomplete="off" data-lpignore="true">
                     <button id="btn-send">Wyślij</button>
                 </div>
             </div>
@@ -69,8 +69,8 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('login-modal')">&times;</span>
             <h2>Autoryzacja</h2>
-            <input type="email" id="login-email" placeholder="Email">
-            <input type="password" id="login-password" placeholder="Hasło">
+            <input type="email" id="login-email" placeholder="Email" autocomplete="username">
+<input type="password" id="login-password" placeholder="Hasło" autocomplete="current-password">
             <button id="btn-login" class="btn-primary">Wejdź do bazy</button>
             <hr>
             <button id="btn-google">Autoryzacja Google</button>
@@ -85,8 +85,8 @@
             <div class="form-grid">
                 <div>
                     <input type="text" id="reg-nickname" placeholder="Twój Sygnatur (Nick)">
-                    <input type="email" id="reg-email" placeholder="Email">
-                    <input type="password" id="reg-password" placeholder="Hasło">
+                    <input type="email" id="reg-email" placeholder="Email" autocomplete="username">
+<input type="password" id="reg-password" placeholder="Hasło" autocomplete="new-password">
                 </div>
                 
                 <div>
