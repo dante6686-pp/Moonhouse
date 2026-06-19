@@ -50,14 +50,21 @@ document.querySelectorAll('#character-picker .picker-item').forEach(img => {
     });
 });
 
-// Wybór statku
-document.querySelectorAll('#ship-picker .picker-item').forEach(box => {
-    box.addEventListener('click', (e) => {
+// Wybór statku w formularzu rejestracji
+document.querySelectorAll('#ship-picker .picker-item').forEach(img => {
+    img.addEventListener('click', (e) => {
+        // Usuń podświetlenie ze wszystkich statków w pickerze
         document.querySelectorAll('#ship-picker .picker-item').forEach(i => i.classList.remove('selected'));
+        
+        // Dodaj podświetlenie do klikniętego obrazka
         e.target.classList.add('selected');
-        selectedShipType = e.target.getAttribute('data-type'); // Pobieramy typ np. "ship-cargo"
+        
+        // Zapisz wybrany typ do zmiennej, która leci do Firebase
+        selectedShipType = e.target.getAttribute('data-type'); 
     });
 });
+
+
 
 
 // ==========================================
