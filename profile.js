@@ -21,7 +21,7 @@ setPersistence(auth, browserLocalPersistence).catch((err) => console.error("Bł�
 const shipNames = {
     "ship-light": "Lekki Zwiadowca",
     "ship-cargo": "Transportowiec Ciężki",
-    "ship-miner": "Koparka Planetarna",
+    "ship-heavy": "Koparka Planetarna",
     "ship-combat": "Fregata Bojowa"
 };
 
