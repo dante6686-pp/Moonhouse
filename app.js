@@ -9,12 +9,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: "TWÓJ_API_KEY",
-    authDomain: "TWÓJ_AUTH_DOMAIN",
-    projectId: "TWÓJ_PROJECT_ID",
-    storageBucket: "TWÓJ_STORAGE_BUCKET",
-    messagingSenderId: "TWÓJ_MESSAGING_SENDER_ID",
-    appId: "TWÓJ_APP_ID"
+  apiKey: "AIzaSyAQfMt3UGWwLUi853-GVF_xVVhG50NzHto",
+  authDomain: "moonhouse-155b7.firebaseapp.com",
+  projectId: "moonhouse-155b7",
+  storageBucket: "moonhouse-155b7.firebasestorage.app",
+  messagingSenderId: "792044657712",
+  appId: "1:792044657712:web:2fbc166d505eecf81e61f5",
+  measurementId: "G-E6Y84RCG7T"
 };
 
 const app = initializeApp(firebaseConfig);
